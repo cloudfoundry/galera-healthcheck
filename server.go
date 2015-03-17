@@ -14,6 +14,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var serverBind = flag.String(
+        "bind",
+        "",
+        "Specifies the IP address to bind to",
+)
+
 var serverPort = flag.Int(
 	"port",
 	8080,
@@ -30,6 +36,18 @@ var mysqlPassword = flag.String(
 	"password",
 	"",
 	"Specifies the MySQL password to connect with",
+)
+
+var mysqlHost = flag.String(
+        "host",
+        "localhost",
+        "Specifies the MySQL host to connect to",
+)
+
+var mysqlPort = flag.Int(
+	"mysqlPort",
+	3306,
+	"Specifies the MySQL port to connect to",
 )
 
 var availableWhenDonor = flag.Bool(
@@ -78,7 +96,7 @@ func main() {
 		panic(err)
 	}
 
-	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@/", *mysqlUser, *mysqlPassword))
+	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/", *mysqlUser, *mysqlPassword, *mysqlHost, *mysqlPort))
 	config := healthcheck.HealthcheckerConfig{
 		*availableWhenDonor,
 		*availableWhenReadOnly,
@@ -87,5 +105,5 @@ func main() {
 	healthchecker = healthcheck.New(db, config)
 
 	http.HandleFunc("/", handler)
-	http.ListenAndServe(fmt.Sprintf(":%d", *serverPort), nil)
+	http.ListenAndServe(fmt.Sprintf("%s:%d", *serverBind, *serverPort), nil)
 }
