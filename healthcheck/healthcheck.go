@@ -21,18 +21,18 @@ type Healthchecker struct {
 }
 
 type Config struct {
-	DB                    DBConfig
-	Host                  string `json:",omitempty"`
-	Port                  int    `json:",omitempty"`
-	AvailableWhenDonor    bool   `json:",omitempty"`
-	AvailableWhenReadOnly bool   `json:",omitempty"`
+	DB                    DBConfig    `yaml:"DB" validate:"nonzero"`
+	Host                  string      `yaml:"Host" validate:"nonzero"`
+	Port                  int         `yaml:"Port" validate:"nonzero"`
+	AvailableWhenDonor    bool        `yaml:"AvailableWhenDonor"`
+	AvailableWhenReadOnly bool        `yaml:"AvailableWhenReadOnly"`
 }
 
 type DBConfig struct {
-	Host     string `json:",omitempty"`
-	User     string `json:",omitempty"`
-	Port     int    `json:",omitempty"`
-	Password string `json:",omitempty"`
+	Host     string `yaml:"Host" validate:"nonzero"`
+	User     string `yaml:"User" validate:"nonzero"`
+	Port     int    `yaml:"Port" validate:"nonzero"`
+	Password string `yaml:"Password" validate:"nonzero"`
 }
 
 func New(db *sql.DB, config Config, logger lager.Logger) *Healthchecker {
