@@ -21,11 +21,11 @@ type Healthchecker struct {
 }
 
 type Config struct {
-	DB                    DBConfig    `yaml:"DB" validate:"nonzero"`
-	Host                  string      `yaml:"Host" validate:"nonzero"`
-	Port                  int         `yaml:"Port" validate:"nonzero"`
-	AvailableWhenDonor    bool        `yaml:"AvailableWhenDonor"`
-	AvailableWhenReadOnly bool        `yaml:"AvailableWhenReadOnly"`
+	DB                    DBConfig `yaml:"DB" validate:"nonzero"`
+	Host                  string   `yaml:"Host" validate:"nonzero"`
+	Port                  int      `yaml:"Port" validate:"nonzero"`
+	AvailableWhenDonor    bool     `yaml:"AvailableWhenDonor"`
+	AvailableWhenReadOnly bool     `yaml:"AvailableWhenReadOnly"`
 }
 
 type DBConfig struct {
