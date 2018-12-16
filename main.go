@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"code.cloudfoundry.org/lager"
 	_ "github.com/go-sql-driver/mysql"
@@ -16,6 +17,7 @@ import (
 	"github.com/cloudfoundry-incubator/galera-healthcheck/monit_client"
 	"github.com/cloudfoundry-incubator/galera-healthcheck/mysqld_cmd"
 	"github.com/cloudfoundry-incubator/galera-healthcheck/sequence_number"
+	"github.com/cloudfoundry-incubator/galera-healthcheck/service_manager"
 )
 
 func main() {
@@ -50,7 +52,19 @@ func main() {
 	}
 
 	mysqldCmd := mysqld_cmd.NewMysqldCmd(logger, *rootConfig)
-	monitClient := monit_client.New(rootConfig.Monit, logger)
+	serviceManager := &service_manager.ServiceManager{
+		ServiceName:   rootConfig.Monit.ServiceName,
+		StateFilePath: rootConfig.Monit.MysqlStateFilePath,
+		MonitClient: monit_client.NewClient(
+			net.JoinHostPort(rootConfig.Monit.Host, rootConfig.Monit.Port),
+			rootConfig.Monit.User,
+			rootConfig.Monit.Password,
+			2*time.Minute,
+		),
+		GaleraInitAddress: "127.0.0.1:8999",
+		Logger:            logger,
+	}
+
 	healthchecker := healthcheck.New(db, *rootConfig, logger)
 	sequenceNumberchecker := sequence_number.New(db, mysqldCmd, *rootConfig, logger)
 	stateSnapshotter := &healthcheck.DBStateSnapshotter{
@@ -61,7 +75,7 @@ func main() {
 	router, err := api.NewRouter(
 		logger,
 		rootConfig,
-		monitClient,
+		serviceManager,
 		sequenceNumberchecker,
 		healthchecker,
 		healthchecker,
