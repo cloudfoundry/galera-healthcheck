@@ -153,7 +153,7 @@ var _ = Describe("Monit", func() {
 		})
 
 		It("returns an error when it cannot make a request", func() {
-			monitClient.URL = &url.URL {
+			monitClient.URL = &url.URL{
 				Path: "some-bad-url",
 			}
 
